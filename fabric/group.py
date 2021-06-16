@@ -243,6 +243,9 @@ class ThreadingGroup(Group):
         results = GroupResult()
         queue = Queue()
         threads = []
+        host_kwargs = kwargs.pop('host_kwargs')
+        for hk in host_kwargs:
+            hk.update(kwargs)
         for cxn in self:
             thread = ExceptionHandlingThread(
                 target=thread_worker,
@@ -251,7 +254,7 @@ class ThreadingGroup(Group):
                     queue=queue,
                     method=method,
                     args=args,
-                    kwargs=kwargs,
+                    kwargs=host_kwargs.get(cxn, kwargs),
                 ),
             )
             threads.append(thread)
