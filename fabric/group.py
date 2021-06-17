@@ -243,7 +243,7 @@ class ThreadingGroup(Group):
         results = GroupResult()
         queue = Queue()
         threads = []
-        host_kwargs = kwargs.pop('host_kwargs')
+        host_kwargs = kwargs.pop('host_kwargs', {})
         for hk in host_kwargs:
             hk.update(kwargs)
         for cxn in self:
