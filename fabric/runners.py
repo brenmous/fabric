@@ -1,4 +1,5 @@
 import signal
+import threading
 
 from invoke import Runner, pty_size, Result as InvokeResult
 
@@ -41,8 +42,10 @@ class Remote(Runner):
             cols, rows = pty_size()
             self.channel.get_pty(width=cols, height=rows)
             # If platform supports, also respond to SIGWINCH (window change) by
-            # sending the sshd a window-change message to update
-            if hasattr(signal, "SIGWINCH"):
+            # sending the sshd a window-change message to update.
+            # Only set signal handler if we're in the main thread,
+            # see: https://docs.python.org/3/library/signal.html#signals-and-threads
+            if threading.current_thread().name == 'MainThread' and hasattr(signal, "SIGWINCH"):
                 signal.signal(signal.SIGWINCH, self.handle_window_change)
         if env:
             # TODO: honor SendEnv from ssh_config (but if we do, _should_ we
